@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -7,7 +8,7 @@ public class NPCController : MonoBehaviour
 {
     [SerializeField] private Type _NPCType;
     [SerializeField] private float _castingDistance = 20;
-    [Header("Type 1")]
+    [Header("Type 1 Settings")]
     [SerializeField] private List<GameObject> _waypoints;
     [SerializeField] private float _distanceToWaypoints;
     private Animator _anim;
@@ -17,6 +18,8 @@ public class NPCController : MonoBehaviour
     private GameObject _target;
     private GameObject _player;
     private Vector3 _direction;
+    private GameObject[] _allBCs;
+
     enum Type
     {
         NONE,
@@ -41,8 +44,10 @@ public class NPCController : MonoBehaviour
         {
             case Type.TYPE_1_PATROLLER:
                 {
-                    TypeOne();
                     Look();
+                    SmellBreadCrumb();
+                    Listen();
+                    TypeOne();
                     break;
                 }
         }
@@ -53,7 +58,7 @@ public class NPCController : MonoBehaviour
         if (_animInfo.IsName("Follow Player")) FollowPlayer();
         else FollowWaypoints();
 
-         _anim.SetBool("isWalking", true);
+        _anim.SetBool("isPatrolling", true);
     }
 
     private void FollowWaypoints()
@@ -99,5 +104,34 @@ public class NPCController : MonoBehaviour
             if (isInFieldOfView) _anim.SetBool("canSeePlayer", true);
             else _anim.SetBool("canSeePlayer", false);
         }
+        else _anim.SetBool("canSeePlayer", false);
+    }
+
+    private void SmellBreadCrumb()
+    {
+
+        _allBCs = GameObject.FindGameObjectsWithTag("BC");
+        float minDistance = 2;
+        bool detectedBC = false;
+
+        for (int i = 0; i < _allBCs.Length - 1; i++)
+        {
+            if (Vector3.Distance(transform.position, _allBCs[i].transform.position) < minDistance)
+            {
+                detectedBC = true;
+                break;
+            }
+        }
+
+        if (detectedBC) _anim.SetBool("canSmellPlayer", true);
+        else _anim.SetBool("canSmellPlayer", false);
+    }
+
+    private void Listen()
+    {
+        float distance = Vector3.Distance(transform.position, _player.transform.position);
+
+        if (distance < 3) _anim.SetBool("canHearPlayer", true);
+        else _anim.SetBool("canHearPlayer", false);
     }
 }
