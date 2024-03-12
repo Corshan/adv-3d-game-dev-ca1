@@ -21,11 +21,13 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody _rb;
     private bool _grounded;
     private bool _readyToJump = true;
+    private Gun _gun;
 
     // Start is called before the first frame update
     void Start()
     {
         _rb = GetComponent<Rigidbody>();
+        _gun = GetComponent<Gun>();
         _rb.freezeRotation = true;
     }
 
@@ -37,6 +39,12 @@ public class PlayerMovement : MonoBehaviour
         SpeedControl();
 
         _rb.drag = _grounded ? _groundDrag : 0;
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            _gun.Fire();
+            // Debug.Log("Fire");
+        }
     }
 
     void FixedUpdate()

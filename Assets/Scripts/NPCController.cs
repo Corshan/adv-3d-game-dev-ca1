@@ -8,9 +8,11 @@ public class NPCController : MonoBehaviour
 {
     [SerializeField] private Type _NPCType;
     [SerializeField] private float _castingDistance = 20;
-    [Header("Type 1 Settings")]
+    [Header("Type 1 & 2 - Settings")]
     [SerializeField] private List<GameObject> _waypoints;
     [SerializeField] private float _distanceToWaypoints;
+    private Gun _gun;
+    private float _gunTimer;
     private Animator _anim;
     private NavMeshAgent _agent;
     private AnimatorStateInfo _animInfo;
@@ -19,11 +21,13 @@ public class NPCController : MonoBehaviour
     private GameObject _player;
     private Vector3 _direction;
     private GameObject[] _allBCs;
+    private bool _isDead = false;
 
     enum Type
     {
         NONE,
-        TYPE_1_PATROLLER
+        TYPE_1_PATROLLER,
+        TYPE_2_INTELLIGENT_PATROLLER,
     }
     // Start is called before the first frame update
     void Start()
@@ -33,6 +37,7 @@ public class NPCController : MonoBehaviour
         _animInfo = _anim.GetCurrentAnimatorStateInfo(0);
         _currentIndex = 0;
         _player = GameObject.Find("Player");
+        _gun = GetComponent<Gun>();
     }
 
     // Update is called once per frame
@@ -40,13 +45,18 @@ public class NPCController : MonoBehaviour
     {
         _animInfo = _anim.GetCurrentAnimatorStateInfo(0);
 
+        if (_animInfo.IsName("Death") || _isDead)
+        {
+            _isDead = true;
+            _agent.isStopped = true;
+            return;
+        }
+
         switch (_NPCType)
         {
             case Type.TYPE_1_PATROLLER:
                 {
-                    Look();
-                    SmellBreadCrumb();
-                    Listen();
+                    Senses();
                     TypeOne();
                     break;
                 }
@@ -55,7 +65,22 @@ public class NPCController : MonoBehaviour
 
     private void TypeOne()
     {
-        if (_animInfo.IsName("Follow Player")) FollowPlayer();
+        if (_animInfo.IsName("Follow Player") || _animInfo.IsName("Fire Gun"))
+        {
+            if (_gunTimer >= 3 && _gun.HasAmmo())
+            {
+                _gun.Fire();
+                _gunTimer = 0;
+                _anim.SetBool("isFiring", true);
+            }
+            else
+            {
+                FollowPlayer();
+                _anim.SetBool("isFiring", false);
+            }
+
+            _gunTimer += Time.deltaTime;
+        }
         else FollowWaypoints();
 
         _anim.SetBool("isPatrolling", true);
@@ -80,7 +105,14 @@ public class NPCController : MonoBehaviour
         _agent.SetDestination(_player.transform.position);
     }
 
-    void Look()
+    private void Senses()
+    {
+        Look();
+        SmellBreadCrumb();
+        Listen();
+    }
+
+    private void Look()
     {
         _direction = (_player.transform.position - transform.position).normalized;
         bool isInFieldOfView = Vector3.Dot(transform.forward.normalized, _direction) > 0.7f;
