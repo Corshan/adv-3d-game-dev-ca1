@@ -4,17 +4,22 @@ using UnityEngine;
 
 public class Health : MonoBehaviour
 {
-    [SerializeField][Range(10, 100)] private int _maxhealth = 100;
+    [SerializeField][Range(10, 100)] private int _maxHealth = 100;
     [SerializeField][Range(10, 100)] private int _damageAmount = 10;
+    [SerializeField][Range(10, 20)] private int _healthAmount = 10;
     private int _currentHealth;
+    public int CurrentHealth => _currentHealth;
+    public int MaxHealth => _maxHealth;
     private Animator _anim;
+    private NPCController _controller;
     private float _timer = 0;
 
     // Start is called before the first frame update
     void Start()
     {
         _anim = GetComponent<Animator>();
-        _currentHealth = _maxhealth;
+        _currentHealth = _maxHealth;
+        _controller = GetComponent<NPCController>();
     }
 
     // void Update()
@@ -31,9 +36,20 @@ public class Health : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("Bullet")) return;
+        // Debug.Log($"{name}  {other.tag}  {other.name}");
 
-        UpdateHealth(_damageAmount);
+        if (other.CompareTag("Bullet"))
+        {
+
+            if (_controller.NpcType == NPCController.Type.TYPE_2_INTELLIGENT_PATROLLER) _anim.SetBool("isHit", true);
+
+            UpdateHealth(_damageAmount);
+        }
+        else if (other.CompareTag("HealthPack"))
+        {
+            _currentHealth = ((_currentHealth + _healthAmount) < _maxHealth) ? _currentHealth + _healthAmount : _maxHealth;
+            Destroy(other.gameObject);
+        }
     }
 
     private void UpdateHealth(int damage)
@@ -41,7 +57,7 @@ public class Health : MonoBehaviour
         if (_currentHealth <= 0) return;
 
         _currentHealth -= damage;
-        Debug.Log(_currentHealth);
+        Debug.Log($"{name}   {_currentHealth}");
 
         if (_currentHealth <= 0) _anim.SetTrigger("dead");
     }
