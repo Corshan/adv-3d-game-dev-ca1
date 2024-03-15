@@ -2013,6 +2013,8 @@ MonoBehaviour:
   - {fileID: 0}
   _distanceToWaypoints: 2
   _ammoPercentage: 0.2
+  _healthPercentage: 0.2
+  _fleeDistance: 10
 --- !u!114 &4166264102207720485
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2029,7 +2031,7 @@ MonoBehaviour:
   _bulletForce: 30.5
   _guntip: {fileID: 855589498009024384}
   _bulletTimer: 3
-  _maxAmmo: 10
+  _maxAmmo: 100
   _ammoAmount: 5
   _type: 2
 --- !u!114 &555349642075721547
@@ -2046,6 +2048,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _maxHealth: 100
   _damageAmount: 10
+  _healthAmount: 10
 --- !u!1 &5312922144378337611
 GameObject:
   m_ObjectHideFlags: 0

@@ -14,6 +14,7 @@ public class NPCController : MonoBehaviour
     [SerializeField][Range(0, 1)] private float _ammoPercentage = 0.2f;
     [SerializeField][Range(0, 1)] private float _healthPercentage = 0.2f;
     [SerializeField][Range(1, 10)] private float _fleeDistance = 2;
+    [Header("Type 3 - Settings")]
     private Gun _gun;
     private float _gunTimer;
     private Animator _anim;
@@ -34,6 +35,7 @@ public class NPCController : MonoBehaviour
         NONE,
         TYPE_1_PATROLLER,
         TYPE_2_INTELLIGENT_PATROLLER,
+        TYPE_3_HUNTER
     }
     // Start is called before the first frame update
     void Start()
@@ -71,7 +73,14 @@ public class NPCController : MonoBehaviour
                     TypeTwo();
                     break;
                 }
+            case Type.TYPE_3_HUNTER:
+                {
+                    TypeThree();
+                    break;
+                }
         }
+
+        _anim.SetBool("isPatrolling", true);
     }
 
     private void TypeOne()
@@ -80,8 +89,6 @@ public class NPCController : MonoBehaviour
 
         if (_animInfo.IsName("Follow Player") || _animInfo.IsName("Fire Gun")) HandleFireGun();
         else FollowWaypoints();
-
-        _anim.SetBool("isPatrolling", true);
     }
 
     private void TypeTwo()
@@ -97,9 +104,20 @@ public class NPCController : MonoBehaviour
         CheckAmmo();
         CheckHealth();
 
-        _anim.SetBool("isPatrolling", true);
+        if (Vector3.Distance(transform.position, _player.transform.position) > _fleeDistance) _anim.SetBool("isFleeing", false);
+    }
 
-        if(Vector3.Distance(transform.position, _player.transform.position) > _fleeDistance) _anim.SetBool("isFleeing", false);
+    private void TypeThree()
+    {
+        if (_animInfo.IsName("Follow Player")) HandleFireGun();
+        else if (_animInfo.IsName("Find Ammo") && _isAmmoPacks) FindAmmoPack();
+        else if (_animInfo.IsName("Find Health Pack") && _isHealthPacks) FindhealthPack();
+        else if (_animInfo.IsName("Flee")) Flee();
+
+        CheckAmmo();
+        CheckHealth();
+
+        if (Vector3.Distance(transform.position, _player.transform.position) > _fleeDistance) _anim.SetBool("isFleeing", false);
     }
 
     private void Flee()
@@ -107,7 +125,7 @@ public class NPCController : MonoBehaviour
         _anim.SetBool("isFleeing", true);
 
         Vector3 fleeDirection = (this.transform.position - _player.transform.position).normalized;
-        Vector3 newGoal = this.transform.position + fleeDirection * _fleeDistance/2;
+        Vector3 newGoal = this.transform.position + fleeDirection * _fleeDistance / 2;
 
         NavMeshPath path = new NavMeshPath();
         _agent.CalculatePath(newGoal, path);
@@ -119,7 +137,8 @@ public class NPCController : MonoBehaviour
 
     private void HandleFireGun()
     {
-        if (_gunTimer >= 3 && _gun.HasAmmo())
+        float distance = Vector3.Distance(transform.position, _player.transform.position);
+        if (_gunTimer >= 3 && _gun.HasAmmo() && distance <= 3)
         {
             _gun.Fire();
             _gunTimer = 0;
