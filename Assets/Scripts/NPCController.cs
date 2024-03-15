@@ -13,6 +13,7 @@ public class NPCController : MonoBehaviour
     [SerializeField][Range(2, 10)] private float _distanceToWaypoints = 2;
     [SerializeField][Range(0, 1)] private float _ammoPercentage = 0.2f;
     [SerializeField][Range(0, 1)] private float _healthPercentage = 0.2f;
+    [SerializeField][Range(1, 10)] private float _fleeDistance = 2;
     private Gun _gun;
     private float _gunTimer;
     private Animator _anim;
@@ -91,11 +92,29 @@ public class NPCController : MonoBehaviour
         else if (_animInfo.IsName("Patrolling")) FollowRandomWaypoints();
         else if (_animInfo.IsName("Find Ammo") && _isAmmoPacks) FindAmmoPack();
         else if (_animInfo.IsName("Find Health Pack") && _isHealthPacks) FindhealthPack();
+        else if (_animInfo.IsName("Flee")) Flee();
 
         CheckAmmo();
         CheckHealth();
 
         _anim.SetBool("isPatrolling", true);
+
+        if(Vector3.Distance(transform.position, _player.transform.position) > _fleeDistance) _anim.SetBool("isFleeing", false);
+    }
+
+    private void Flee()
+    {
+        _anim.SetBool("isFleeing", true);
+
+        Vector3 fleeDirection = (this.transform.position - _player.transform.position).normalized;
+        Vector3 newGoal = this.transform.position + fleeDirection * _fleeDistance/2;
+
+        NavMeshPath path = new NavMeshPath();
+        _agent.CalculatePath(newGoal, path);
+
+        if (path.status != NavMeshPathStatus.PathInvalid) _agent.SetDestination(path.corners[path.corners.Length - 1]);
+
+        _anim.SetBool("isHit", false);
     }
 
     private void HandleFireGun()

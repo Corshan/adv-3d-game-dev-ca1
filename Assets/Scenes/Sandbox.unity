@@ -1153,6 +1153,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Health Pack
       objectReference: {fileID: 0}
+    - target: {fileID: 5620724151806072747, guid: eeb6cd69947163e43af402ba23d0a5d0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1209,6 +1213,10 @@ PrefabInstance:
     - target: {fileID: 7421320064745989615, guid: acf2c9b8c55ed79438d3d22cdaba2d3f, type: 3}
       propertyPath: m_Name
       value: Ammo Pack
+      objectReference: {fileID: 0}
+    - target: {fileID: 7421320064745989615, guid: acf2c9b8c55ed79438d3d22cdaba2d3f, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1373,6 +1381,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 229965514373623086, guid: 07d4316a7570fa44f91d57210f879405, type: 3}
+      propertyPath: _fleeDistance
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 229965514373623086, guid: 07d4316a7570fa44f91d57210f879405, type: 3}
       propertyPath: _waypoints.Array.data[0]
       value: 
