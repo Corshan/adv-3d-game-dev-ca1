@@ -7,14 +7,16 @@ public class NPCController : MonoBehaviour
 {
     public Type NpcType => _NPCType;
     [SerializeField] private Type _NPCType;
-    [SerializeField] private float _castingDistance = 20;
+    [SerializeField][Range(10,50)] private float _castingDistance = 20;
     [Header("Type 1 & 2 - Settings")]
     [SerializeField] private List<GameObject> _waypoints;
     [SerializeField][Range(2, 10)] private float _distanceToWaypoints = 2;
     [SerializeField][Range(0, 1)] private float _ammoPercentage = 0.2f;
     [SerializeField][Range(0, 1)] private float _healthPercentage = 0.2f;
     [SerializeField][Range(1, 10)] private float _fleeDistance = 2;
-    [Header("Type 3 - Settings")]
+    [Header("Type 4 - Settings")]
+    [SerializeField][Range(1, 20)] private float _fireDistance = 3;
+    [SerializeField] private Transform _ambushSpot;
     private Gun _gun;
     private float _gunTimer;
     private Animator _anim;
@@ -29,13 +31,15 @@ public class NPCController : MonoBehaviour
     private Health _health;
     private bool _isAmmoPacks;
     private bool _isHealthPacks;
+    private Vector3 _startingPos;
 
     public enum Type
     {
         NONE,
         TYPE_1_PATROLLER,
         TYPE_2_INTELLIGENT_PATROLLER,
-        TYPE_3_HUNTER
+        TYPE_3_HUNTER,
+        TYPE_4_SNIPER,
     }
     // Start is called before the first frame update
     void Start()
@@ -78,6 +82,11 @@ public class NPCController : MonoBehaviour
                     TypeThree();
                     break;
                 }
+            case Type.TYPE_4_SNIPER:
+                {
+                    TypeFour();
+                    break;
+                }
         }
 
         _anim.SetBool("isPatrolling", true);
@@ -87,7 +96,7 @@ public class NPCController : MonoBehaviour
     {
         Senses();
 
-        if (_animInfo.IsName("Follow Player") || _animInfo.IsName("Fire Gun")) HandleFireGun();
+        if (_animInfo.IsName("Follow Player") || _animInfo.IsName("Fire Gun")) FireGun();
         else FollowWaypoints();
     }
 
@@ -95,7 +104,7 @@ public class NPCController : MonoBehaviour
     {
         Senses();
 
-        if (_animInfo.IsName("Follow Player") || _animInfo.IsName("Fire Gun")) HandleFireGun();
+        if (_animInfo.IsName("Follow Player") || _animInfo.IsName("Fire Gun")) FireGun();
         else if (_animInfo.IsName("Patrolling")) FollowRandomWaypoints();
         else if (_animInfo.IsName("Find Ammo") && _isAmmoPacks) FindAmmoPack();
         else if (_animInfo.IsName("Find Health Pack") && _isHealthPacks) FindhealthPack();
@@ -109,7 +118,7 @@ public class NPCController : MonoBehaviour
 
     private void TypeThree()
     {
-        if (_animInfo.IsName("Follow Player")) HandleFireGun();
+        if (_animInfo.IsName("Follow Player")) FireGun();
         else if (_animInfo.IsName("Find Ammo") && _isAmmoPacks) FindAmmoPack();
         else if (_animInfo.IsName("Find Health Pack") && _isHealthPacks) FindhealthPack();
         else if (_animInfo.IsName("Flee")) Flee();
@@ -118,6 +127,46 @@ public class NPCController : MonoBehaviour
         CheckHealth();
 
         if (Vector3.Distance(transform.position, _player.transform.position) > _fleeDistance) _anim.SetBool("isFleeing", false);
+    }
+
+    private void TypeFour()
+    {
+        Look();
+
+        if (_animInfo.IsName("Fire Gun") || _animInfo.IsName("Player In Range")) FireGun(sniper: true);
+        else if (_animInfo.IsName("Find Ammo") && _isAmmoPacks) FindAmmoPack();
+        else if (_animInfo.IsName("Find Health Pack") && _isHealthPacks) FindhealthPack();
+        else if (_animInfo.IsName("Flee")) Flee();
+        else if (_animInfo.IsName("Go To Ambush")) GoToAmbushSpot();
+        else if (_animInfo.IsName("Back to Start Point")) GotoStartPos();
+
+        CheckAmmo();
+        CheckHealth();
+
+        if (Vector3.Distance(transform.position, _player.transform.position) > _fleeDistance) _anim.SetBool("isFleeing", false);
+        else _anim.SetBool("isFleeing", true);
+
+
+        if (Vector3.Distance(transform.position, _player.transform.position) < _fireDistance) _anim.SetBool("isInRange", true);
+        else _anim.SetBool("isInRange", false);
+    }
+
+    public void TriggerAmbush()
+    {
+        _startingPos = transform.position;
+        _anim.SetTrigger("ambush");
+    }
+
+    private void GoToAmbushSpot()
+    {
+        _agent.SetDestination(_ambushSpot.position);
+        if (Vector3.Distance(transform.position, _ambushSpot.position) <= 2) _anim.SetBool("throwGenade", true);
+    }
+
+    private void GotoStartPos()
+    {
+        _agent.SetDestination(_startingPos);
+        if (Vector3.Distance(transform.position, _startingPos) <= 2) _anim.SetBool("isAtStartingPoint", true);
     }
 
     private void Flee()
@@ -135,19 +184,21 @@ public class NPCController : MonoBehaviour
         _anim.SetBool("isHit", false);
     }
 
-    private void HandleFireGun()
+    private void FireGun(bool sniper = false)
     {
         float distance = Vector3.Distance(transform.position, _player.transform.position);
-        if (_gunTimer >= 3 && _gun.HasAmmo() && distance <= 3)
+        if (_gunTimer >= 3 && _gun.HasAmmo() && distance <= _fireDistance)
         {
             _gun.Fire();
             _gunTimer = 0;
             _anim.SetBool("isFiring", true);
             _agent.isStopped = true;
+
+            if (sniper) transform.LookAt(_player.transform.position);
         }
         else
         {
-            FollowPlayer();
+            if (!sniper) FollowPlayer();
             _anim.SetBool("isFiring", false);
             _agent.isStopped = false;
         }
@@ -175,7 +226,7 @@ public class NPCController : MonoBehaviour
     private void CheckHealth()
     {
         float percent = (_health.MaxHealth == 100) ? _health.CurrentHealth / 100f : _health.CurrentHealth / 100f * _health.MaxHealth;
-        Debug.Log(percent);
+        // Debug.Log(percent);
 
         if (percent <= _healthPercentage)
         {
@@ -293,7 +344,7 @@ public class NPCController : MonoBehaviour
 
         if (Physics.Raycast(ray.origin, _direction, out hit, _castingDistance) && Vector3.Distance(transform.position, _player.transform.position) < _castingDistance)
         {
-            if (isInFieldOfView) _anim.SetBool("canSeePlayer", true);
+            if (isInFieldOfView && hit.collider.CompareTag("Player")) _anim.SetBool("canSeePlayer", true);
             else _anim.SetBool("canSeePlayer", false);
         }
         else _anim.SetBool("canSeePlayer", false);

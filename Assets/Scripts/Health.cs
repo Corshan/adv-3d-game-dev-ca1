@@ -57,7 +57,7 @@ public class Health : MonoBehaviour
         if (_currentHealth <= 0) return;
 
         _currentHealth -= damage;
-        Debug.Log($"{name}   {_currentHealth}");
+        // Debug.Log($"{name}   {_currentHealth}");
 
         if (_currentHealth <= 0) _anim.SetTrigger("dead");
     }
