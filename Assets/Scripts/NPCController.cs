@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -7,9 +8,8 @@ public class NPCController : MonoBehaviour
 {
     public Type NpcType => _NPCType;
     [SerializeField] private Type _NPCType;
-    [SerializeField][Range(10,50)] private float _castingDistance = 20;
+    [SerializeField][Range(10, 50)] private float _castingDistance = 20;
     [Header("Type 1 & 2 - Settings")]
-    [SerializeField] private List<GameObject> _waypoints;
     [SerializeField][Range(2, 10)] private float _distanceToWaypoints = 2;
     [SerializeField][Range(0, 1)] private float _ammoPercentage = 0.2f;
     [SerializeField][Range(0, 1)] private float _healthPercentage = 0.2f;
@@ -32,6 +32,7 @@ public class NPCController : MonoBehaviour
     private bool _isAmmoPacks;
     private bool _isHealthPacks;
     private Vector3 _startingPos;
+    private List<GameObject> _waypoints;
 
     public enum Type
     {
@@ -45,11 +46,12 @@ public class NPCController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        _waypoints = GameObject.FindGameObjectsWithTag("Waypoint").ToList();
         _anim = GetComponent<Animator>();
         _agent = GetComponent<NavMeshAgent>();
         _animInfo = _anim.GetCurrentAnimatorStateInfo(0);
         _currentIndex = (_NPCType == Type.TYPE_1_PATROLLER) ? 0 : Random.Range(0, _waypoints.Count);
-        _player = GameObject.Find("Player");
+        _player = GameObject.FindGameObjectWithTag("Player");
         _gun = GetComponent<Gun>();
         _health = GetComponent<Health>();
     }
@@ -268,6 +270,7 @@ public class NPCController : MonoBehaviour
             Debug.Log($"{name}   {_currentIndex}");
         }
 
+        _agent.stoppingDistance = 0;
         _agent.SetDestination(_target.transform.position);
     }
 
@@ -280,6 +283,7 @@ public class NPCController : MonoBehaviour
         _target = FindCloset(ammoPacks);
 
         if (_target != null) _agent.SetDestination(_target.transform.position);
+        _agent.stoppingDistance = 0;
     }
 
     private void FindhealthPack()
@@ -291,6 +295,7 @@ public class NPCController : MonoBehaviour
         _target = FindCloset(healthPacks);
 
         if (_target != null) _agent.SetDestination(_target.transform.position);
+        _agent.stoppingDistance = 0;
     }
 
     private GameObject FindCloset(GameObject[] items)
@@ -314,6 +319,7 @@ public class NPCController : MonoBehaviour
 
     private void FollowPlayer()
     {
+        _agent.stoppingDistance = 2;
         _agent.SetDestination(_player.transform.position);
     }
 

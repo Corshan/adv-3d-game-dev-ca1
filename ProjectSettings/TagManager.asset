@@ -12,6 +12,9 @@ TagManager:
   - PlayerTeam
   - NpcTeam
   - Leader
+  - HealthPackPoint
+  - AmmoPackPoint
+  - Waypoint
   layers:
   - Default
   - TransparentFX
