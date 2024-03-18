@@ -9,6 +9,9 @@ TagManager:
   - Ammo
   - BulletNpc
   - HealthPack
+  - PlayerTeam
+  - NpcTeam
+  - Leader
   layers:
   - Default
   - TransparentFX

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4035615805824834064}
   - component: {fileID: 5676493154394535861}
   - component: {fileID: 7400714756933086336}
+  - component: {fileID: 4655714836333607394}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -115,11 +116,35 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _bulletPrefab: {fileID: 6051919404342715973, guid: 66a6dc237fcabf94fac367c5df289aed, type: 3}
-  _bulletForce: 25
+  _bulletForce: 30
   _guntip: {fileID: 0}
   _bulletTimer: 3
   _maxAmmo: 100
+  _ammoAmount: 4
   _type: 1
+--- !u!114 &4655714836333607394
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1173836274117094802}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8db477b1c585b341be00e9515f56f8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _waypoints: []
+  _teamMembers:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  _distanceToWaypoint: 0
+  _type: 0
 --- !u!1 &2407194594618899042
 GameObject:
   m_ObjectHideFlags: 0
@@ -165,7 +190,7 @@ GameObject:
   - component: {fileID: 2514235250830866745}
   m_Layer: 0
   m_Name: Model
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -40,6 +40,7 @@ public class NPCController : MonoBehaviour
         TYPE_2_INTELLIGENT_PATROLLER,
         TYPE_3_HUNTER,
         TYPE_4_SNIPER,
+        TYPE_5_TEAM,
     }
     // Start is called before the first frame update
     void Start()

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Health : MonoBehaviour
@@ -7,6 +8,7 @@ public class Health : MonoBehaviour
     [SerializeField][Range(10, 100)] private int _maxHealth = 100;
     [SerializeField][Range(10, 100)] private int _damageAmount = 10;
     [SerializeField][Range(10, 20)] private int _healthAmount = 10;
+    [SerializeField] private bool _isTeamMember = false;
     private int _currentHealth;
     public int CurrentHealth => _currentHealth;
     public int MaxHealth => _maxHealth;
@@ -41,7 +43,7 @@ public class Health : MonoBehaviour
         if (other.CompareTag("Bullet"))
         {
 
-            if (_controller.NpcType == NPCController.Type.TYPE_2_INTELLIGENT_PATROLLER) _anim.SetBool("isHit", true);
+            if (_controller != null &&_controller.NpcType == NPCController.Type.TYPE_2_INTELLIGENT_PATROLLER) _anim.SetBool("isHit", true);
 
             UpdateHealth(_damageAmount);
         }
@@ -52,13 +54,15 @@ public class Health : MonoBehaviour
         }
     }
 
-    private void UpdateHealth(int damage)
+    public void UpdateHealth(int damage)
     {
         if (_currentHealth <= 0) return;
 
         _currentHealth -= damage;
-        // Debug.Log($"{name}   {_currentHealth}");
+        Debug.Log($"{name}   {_currentHealth}");
 
         if (_currentHealth <= 0) _anim.SetTrigger("dead");
     }
+
+    public bool IsDead() => _currentHealth <= 0;
 }
