@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Health : MonoBehaviour
 {
@@ -9,6 +10,8 @@ public class Health : MonoBehaviour
     [SerializeField][Range(10, 100)] private int _damageAmount = 10;
     [SerializeField][Range(10, 20)] private int _healthAmount = 10;
     [SerializeField] private bool _isTeamMember = false;
+    [SerializeField] private Image _image;
+    [SerializeField] private GameObject _canvas;
     private int _currentHealth;
     public int CurrentHealth => _currentHealth;
     public int MaxHealth => _maxHealth;
@@ -22,19 +25,14 @@ public class Health : MonoBehaviour
         _anim = GetComponent<Animator>();
         _currentHealth = _maxHealth;
         _controller = GetComponent<NPCController>();
+
+        _image.fillAmount = 1;
     }
 
-    // void Update()
-    // {
-    //     _timer += Time.deltaTime;
-
-    //     if (_timer >= 1)
-    //     {
-    //         UpdateHealth(_damageAmount);
-    //         Debug.Log(_currentHealth);
-    //         _timer = 0;
-    //     }
-    // }
+    void Update()
+    {
+        _canvas.SetActive(_currentHealth > 0);
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -43,7 +41,7 @@ public class Health : MonoBehaviour
         if (other.CompareTag("Bullet"))
         {
 
-            if (_controller != null &&_controller.NpcType == NPCController.Type.TYPE_2_INTELLIGENT_PATROLLER) _anim.SetBool("isHit", true);
+            if (_controller != null && _controller.NpcType == NPCController.Type.TYPE_2_INTELLIGENT_PATROLLER) _anim.SetBool("isHit", true);
 
             UpdateHealth(_damageAmount);
         }
@@ -62,6 +60,13 @@ public class Health : MonoBehaviour
         Debug.Log($"{name}   {_currentHealth}");
 
         if (_currentHealth <= 0) _anim.SetTrigger("dead");
+
+        if (_image != null)
+        {
+            float a = (float)_currentHealth / (float)_maxHealth;
+            Debug.Log($"{a}   {_currentHealth}   {_maxHealth}");
+            _image.fillAmount = a;
+        }
     }
 
     public bool IsDead() => _currentHealth <= 0;
