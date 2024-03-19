@@ -9,7 +9,7 @@ public class Gun : MonoBehaviour
     [SerializeField] private Transform _guntip;
     [SerializeField][Range(1, 10)] private float _bulletTimer = 3;
     [SerializeField][Range(1, 100)] private int _maxAmmo = 10;
-    [SerializeField][Range(1,10)] private int _ammoAmount = 5;
+    [SerializeField][Range(1, 10)] private int _ammoAmount = 5;
     [SerializeField] private Type _type;
     private int _counter;
     private int _currentAmmo;
@@ -51,11 +51,13 @@ public class Gun : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(!other.CompareTag("Ammo")) return;
+        if (other.CompareTag("Ammo") && _currentAmmo < _maxAmmo)
+        {
+            _currentAmmo = ((_currentAmmo + _ammoAmount) < _maxAmmo) ? _currentAmmo + _ammoAmount : _maxAmmo;
 
-        _currentAmmo = ((_currentAmmo + _ammoAmount) < _maxAmmo) ? _currentAmmo + _ammoAmount : _maxAmmo;
+            Destroy(other.gameObject);
+        }
 
-        Destroy(other.gameObject);
     }
 
 }

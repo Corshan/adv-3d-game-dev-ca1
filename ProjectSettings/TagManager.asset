@@ -15,6 +15,7 @@ TagManager:
   - HealthPackPoint
   - AmmoPackPoint
   - Waypoint
+  - Collectable
   layers:
   - Default
   - TransparentFX

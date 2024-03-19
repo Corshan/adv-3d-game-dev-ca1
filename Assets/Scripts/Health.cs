@@ -54,7 +54,7 @@ public class Health : MonoBehaviour
         {
             UpdateHealth(_damageAmount);
         }
-        else if (other.CompareTag("HealthPack"))
+        else if (other.CompareTag("HealthPack") && _currentHealth < _maxHealth)
         {
             _currentHealth = ((_currentHealth + _healthAmount) < _maxHealth) ? _currentHealth + _healthAmount : _maxHealth;
             Destroy(other.gameObject);
