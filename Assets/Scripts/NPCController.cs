@@ -253,7 +253,7 @@ public class NPCController : MonoBehaviour
             _currentIndex++;
 
             if (_currentIndex > _waypoints.Count - 1) _currentIndex = 0;
-            Debug.Log($"{name}   {_currentIndex}");
+            // Debug.Log($"{name}   {_currentIndex}");
         }
 
         _agent.SetDestination(_target.transform.position);

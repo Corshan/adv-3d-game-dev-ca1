@@ -37,6 +37,11 @@ public class Health : MonoBehaviour
     void Update()
     {
        if(_canvas != null) _canvas.SetActive(_currentHealth > 0);
+
+       if (_image != null)
+        {
+            _image.fillAmount = (float)_currentHealth / (float)_maxHealth;
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -66,14 +71,9 @@ public class Health : MonoBehaviour
         if (_currentHealth <= 0) return;
 
         _currentHealth -= damage;
-        Debug.Log($"{name}   {_currentHealth}");
+        // Debug.Log($"{name}   {_currentHealth}");
 
         if (_anim != null && _currentHealth <= 0) _anim.SetTrigger("dead");
-
-        if (_image != null)
-        {
-            _image.fillAmount = (float)_currentHealth / (float)_maxHealth;
-        }
     }
 
     public bool IsDead() => _currentHealth <= 0;

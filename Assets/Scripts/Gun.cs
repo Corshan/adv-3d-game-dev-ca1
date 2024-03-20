@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class Gun : MonoBehaviour
@@ -11,6 +12,7 @@ public class Gun : MonoBehaviour
     [SerializeField][Range(1, 100)] private int _maxAmmo = 10;
     [SerializeField][Range(1, 10)] private int _ammoAmount = 5;
     [SerializeField] private Type _type;
+    [SerializeField] private TextMeshProUGUI _ammoText;
     private int _counter;
     private int _currentAmmo;
     public int CurrentAmmo => _currentAmmo;
@@ -26,6 +28,11 @@ public class Gun : MonoBehaviour
     private void Start()
     {
         _currentAmmo = _maxAmmo;
+    }
+
+    private void Update()
+    {
+        if(_ammoText != null) _ammoText.text = $"Ammo => {_currentAmmo}";
     }
 
     public void Fire()

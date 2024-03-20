@@ -31,6 +31,8 @@ public class Leader : MonoBehaviour
         string targetTag = gameObject.CompareTag("Leader") ? "PlayerTeam" : "NpcTeam";
 
         _teamMembers = GameObject.FindGameObjectsWithTag(targetTag).ToList();
+
+        _waypoints = GameObject.FindGameObjectsWithTag("Waypoint");
     }
 
     // Update is called once per frame

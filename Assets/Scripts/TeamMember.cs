@@ -6,7 +6,7 @@ using UnityEngine.AI;
 
 public class TeamMember : MonoBehaviour
 {
-    [SerializeField] private GameObject _leader;
+    public GameObject _leader;
     [SerializeField][Range(1, 5)] private float _distanceToLeader = 5;
     [SerializeField][Range(1, 5)] private int _damageAmount = 10;
     private Animator _anim;
@@ -22,6 +22,11 @@ public class TeamMember : MonoBehaviour
         _anim = GetComponent<Animator>();
         _agent = GetComponent<NavMeshAgent>();
         _wanderingTarget = new GameObject();
+        
+        if(_leader == null){
+            if(gameObject.CompareTag("NpcTeam")) _leader = GameObject.FindGameObjectWithTag("Leader");
+            else _leader = GameObject.FindGameObjectWithTag("Player");
+        }
     }
 
     // Update is called once per frame
